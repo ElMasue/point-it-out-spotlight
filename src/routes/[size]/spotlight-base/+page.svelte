@@ -4,16 +4,9 @@
 
   export let data: PageData
 
-  // Expose pio library globally for console testing
-  declare global {
-    interface Window {
-      pio?: typeof import('$lib/main')
-    }
-  }
-
   onMount(async () => {
-    const pio = await import('$lib/main')
-    window.pio = pio
+  	const pio = await import('$lib/main')
+  	window.pio = pio
   })
 </script>
 
@@ -21,8 +14,14 @@
   <div class="page-content">
     <p class="outside-text">Text outside target element</p>
 
-    <div class="test-box test-box--{data.w}x{data.h}" style="width: {data.w}px; height: {data.h}px">
-      <p>Text inside target</p>
+    <div class="test-box-wrapper">
+      <div class="test-box-back" style="width: {data.w + 40}px; height: {data.h + 40}px"></div>
+      <div
+        class="test-box test-box--{data.w}x{data.h}"
+        style="width: {data.w}px; height: {data.h}px"
+      >
+        <p>Text inside target</p>
+      </div>
     </div>
 
     <p class="outside-text">More text outside</p>
@@ -42,13 +41,26 @@
     text-align: center;
   }
 
+  .test-box-wrapper {
+    display: grid;
+    place-items: center;
+    position: relative;
+    margin: 40px auto;
+  }
+
+  .test-box-back {
+    grid-area: 1 / 1;
+    background: #333;
+  }
+
   .test-box {
+    grid-area: 1 / 1;
     position: relative;
     z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 40px auto;
+    margin: 0;
   }
 
   .test-box p {

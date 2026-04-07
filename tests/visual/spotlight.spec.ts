@@ -1,52 +1,74 @@
-import { test, expect } from '@playwright/test'
+import { test } from '@playwright/test'
+import { visualComparisonBetweenPages } from './test-utils'
 import * as pio from '../../src/lib/main'
 
-test.describe("create('spotlight')", () => {
-  const testsTargets = [{ xW: 300, xH: 300 }]
+test.describe('create(\'spotlight\')', () => {
+	const testsTargets = [
+		{ xW: 300, xH: 300 },
+		{ xW: 400, xH: 250 }
+	]
 
-  testsTargets.forEach(({ xW, xH }) => {
-    test(`creates a spotlight overlay over target (${xW}x${xH})`, async ({ page }) => {
-      await page.goto(`/${xW}x${xH}`, { waitUntil: 'networkidle' })
+	testsTargets.forEach(({ xW, xH }) => {
+		test(`creates a spotlight overlay over target (${xW}x${xH})`, async ({ page }, testInfo) => {
+			await visualComparisonBetweenPages({
+				testingURL: `/${xW}x${xH}/spotlight-base`,
+				expectedURL: `/${xW}x${xH}/spotlight/default`,
 
-      await page.evaluate(
-        ({ xW, xH }) => {
-          pio.create('spotlight', {
-            target: `.test-box--${xW}x${xH}`
-          })
-        },
-        { xW, xH }
-      )
+				action: async () => {
+					await page.evaluate(
+						({ xW, xH }) => {
+							pio.create('spotlight', {
+								target: `.test-box--${xW}x${xH}`,
+								className: 'result'
+							})
+						},
+						{ xW, xH }
+					)
+				},
 
-      await page.waitForTimeout(500)
-      await expect(page).toHaveScreenshot(`spotlight-default-${xW}x${xH}.png`)
-    })
+				pwPage: page,
+				pwTestInfo: testInfo
+			})
+		})
 
-    test(`spotlight with custom overlayColor (${xW}x${xH})`, async ({ page }) => {
-      await page.goto(`/${xW}x${xH}`, { waitUntil: 'networkidle' })
+		test(`spotlight with custom overlayColor (${xW}x${xH})`, async ({ page }, testInfo) => {
+			await visualComparisonBetweenPages({
+				testingURL: `/${xW}x${xH}/spotlight-base`,
+				expectedURL: `/${xW}x${xH}/spotlight/overlay-color-option`,
 
-      await page.evaluate(() => {
-        pio.create('spotlight', {
-          target: `.test-box`,
-          overlayColor: 'rgba(0, 0, 139, 0.5)'
-        })
-      })
+				action: async () => {
+					await page.evaluate(() => {
+						pio.create('spotlight', {
+							target: '.test-box',
+							overlayColor: 'rgba(0, 0, 139, 0.5)',
+							className: 'result'
+						})
+					})
+				},
 
-      await page.waitForTimeout(500)
-      await expect(page).toHaveScreenshot(`spotlight-overlay-color-${xW}x${xH}.png`)
-    })
+				pwPage: page,
+				pwTestInfo: testInfo
+			})
+		})
 
-    test(`spotlight with padding (${xW}x${xH})`, async ({ page }) => {
-      await page.goto(`/${xW}x${xH}`, { waitUntil: 'networkidle' })
+		test(`spotlight with padding (${xW}x${xH})`, async ({ page }, testInfo) => {
+			await visualComparisonBetweenPages({
+				testingURL: `/${xW}x${xH}/spotlight-base`,
+				expectedURL: `/${xW}x${xH}/spotlight/padding-option`,
 
-      await page.evaluate(() => {
-        pio.create('spotlight', {
-          target: `.test-box`,
-          padding: 20
-        })
-      })
+				action: async () => {
+					await page.evaluate(() => {
+						pio.create('spotlight', {
+							target: '.test-box',
+							padding: 40,
+							className: 'result'
+						})
+					})
+				},
 
-      await page.waitForTimeout(500)
-      await expect(page).toHaveScreenshot(`spotlight-padding-${xW}x${xH}.png`)
-    })
-  })
+				pwPage: page,
+				pwTestInfo: testInfo
+			})
+		})
+	})
 })
